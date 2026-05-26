@@ -1,0 +1,46 @@
+plugins {
+    id 'groovy'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.jenkins-ci.org/releases/' }
+}
+
+dependencies {
+    // Groovy for test compilation
+    testImplementation 'org.codehaus.groovy:groovy-all:2.5.23'
+
+    // JenkinsPipelineUnit framework
+    testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.9'
+
+    // JUnit 4
+    testImplementation 'junit:junit:4.13.2'
+}
+
+// Do NOT compile src/ and vars/ as main sources.
+// JenkinsPipelineUnit loads Jenkinsfiles and shared library vars
+// dynamically at test time via loadScript() and scriptRoots.
+sourceSets {
+    main {
+        groovy {
+            srcDirs = []
+        }
+    }
+    test {
+        groovy {
+            srcDirs = ['pipelines/strategic_image/test/groovy']
+        }
+        java {
+            srcDirs = ['pipelines/strategic_image/test/java']
+        }
+    }
+}
+
+test {
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+}
